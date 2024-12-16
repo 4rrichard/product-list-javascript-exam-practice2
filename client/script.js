@@ -3,32 +3,46 @@ import { products } from "./data.js";
 const loadEvent = function () {
   const rootElement = document.getElementById("root");
 
+  productMainDetails(rootElement);
+};
+
+function productMainDetails(rootElement) {
   products.forEach((product) => {
-    const productContainer = document.createElement("div");
-    productContainer.innerText = `album name: ${product.name}`;
+    const productElements = [
+      { tag: "h1", text: `Album name: ${product.name}` },
+      { tag: "h2", text: `Status: ${product.status}` },
+      { tag: "h3", text: `Price: ${product.price}` },
+    ];
 
-    const productStatus = document.createElement("h2");
-    const productPrice = document.createElement("h3");
-
-    productStatus.innerText = `status: ${product.status}`;
-    productPrice.innerText = `price: ${product.price}`;
-
-    productContainer.appendChild(productStatus);
-    productContainer.appendChild(productPrice);
-    product.details.forEach((details) => {
-      const productDetailName = document.createElement("div");
-      const productDetailAlbumId = document.createElement("h2");
-      const productDetailTrackId = document.createElement("h3");
-      productDetailName.innerText = `track name: ${details.name}`;
-      productDetailAlbumId.innerText = `album id: ${details.album_id}`;
-      productDetailTrackId.innerText = `track id: ${details.track_id}`;
-      productContainer.appendChild(productDetailName);
-      productContainer.appendChild(productDetailAlbumId);
-      productContainer.appendChild(productDetailTrackId);
-    });
-
+    const productContainer = createElements(productElements, "div");
+    productSubDetails(productContainer, product);
     rootElement.appendChild(productContainer);
   });
-};
+}
+
+function productSubDetails(parentContainer, product) {
+  product.details.forEach((details) => {
+    const detailElements = [
+      { tag: "h2", text: `Track name: ${details.name}` },
+      { tag: "h3", text: `Track id: ${details.track_id}` },
+      { tag: "h4", text: `Album id: ${details.album_id}` },
+    ];
+    const detailContainer = createElements(detailElements, "div");
+
+    parentContainer.appendChild(detailContainer);
+  });
+}
+
+function createElements(elements, parentTag) {
+  const parent = document.createElement(parentTag);
+
+  elements.forEach(({ tag, text }) => {
+    const child = document.createElement(tag);
+    child.textContent = text;
+    parent.appendChild(child);
+  });
+
+  return parent;
+}
 
 window.addEventListener("load", loadEvent);
