@@ -14,7 +14,7 @@ function productMainDetails(rootElement) {
       { tag: "h3", text: `Price: ${product.price}` },
     ];
 
-    const productContainer = createElements(productElements, "div");
+    const productContainer = createElements(productElements);
     productSubDetails(productContainer, product);
     rootElement.appendChild(productContainer);
   });
@@ -27,14 +27,14 @@ function productSubDetails(parentContainer, product) {
       { tag: "h3", text: `Track id: ${details.track_id}` },
       { tag: "h4", text: `Album id: ${details.album_id}` },
     ];
-    const detailContainer = createElements(detailElements, "div");
+    const detailContainer = createElements(detailElements);
 
     parentContainer.appendChild(detailContainer);
   });
 }
 
-function createElements(elements, parentTag) {
-  const parent = document.createElement(parentTag);
+function createElements(elements) {
+  const parent = document.createElement("div");
 
   elements.forEach(({ tag, text }) => {
     const child = document.createElement(tag);
