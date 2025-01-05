@@ -3,10 +3,13 @@ import { products } from "./data.js";
 const loadEvent = function () {
   const rootElement = document.getElementById("root");
   const originalProducts = [...products];
-  productMainDetails(rootElement, originalProducts);
+  const selectedTracks = [];
+  productMainDetails(rootElement, originalProducts, selectedTracks);
 };
 
-function productMainDetails(rootElement, originalProducts) {
+function productMainDetails(rootElement, originalProducts, selectedTracks) {
+  let calcButtonCreated = false;
+
   createSelectElement(rootElement, originalProducts);
   createSearchFilter(rootElement, originalProducts);
 
@@ -29,21 +32,102 @@ function productMainDetails(rootElement, originalProducts) {
 
     const productElementTree = createElements(productElements);
 
-    productSubDetails(productElementTree.parent, product);
+    productSubDetails(
+      productElementTree.parent,
+      product,
+      rootElement,
+      selectedTracks,
+      calcButtonCreated
+    );
     rootElement.appendChild(productElementTree.parent);
   });
 }
 
-function productSubDetails(parentContainer, product) {
+function productSubDetails(
+  parentContainer,
+  product,
+  rootElement,
+  selectedTracks,
+  calcButtonCreated
+) {
   product.details.forEach((details) => {
     const detailElements = [
       { tag: "h2", text: `Track name: ${details.name}` },
       { tag: "h3", text: `Track id: ${details.track_id}` },
       { tag: "h4", text: `Album id: ${details.album_id}` },
+      { tag: "button", text: "Add list for calculation" },
     ];
     const detailElementTree = createElements(detailElements);
+
+    detailElementTree.children[3].addEventListener("click", (event) => {
+      handleAddToFavs(
+        event,
+        details,
+        rootElement,
+        selectedTracks,
+        calcButtonCreated
+      );
+      calcButtonCreated = true;
+    });
     parentContainer.append(...detailElementTree.children);
   });
+}
+
+function handleAddToFavs(
+  event,
+  details,
+  rootElement,
+  selectedTracks,
+  calcButtonCreated
+) {
+  event.preventDefault();
+
+  selectedTracks.push(details.milliseconds);
+
+  if (!calcButtonCreated) {
+    createCalcButton(selectedTracks, rootElement);
+  }
+}
+
+function createCalcButton(selectedTracks, rootElement) {
+  const calcAverageButtonElements = [
+    { tag: "button", text: "Calculate average duration" },
+  ];
+
+  const calcButtonTree = createElements(calcAverageButtonElements);
+
+  calcButtonTree.children[0].addEventListener("click", (e) => {
+    calcButtonHandle(e, selectedTracks, calcButtonTree.parent);
+  });
+
+  rootElement.prepend(calcButtonTree.parent);
+}
+
+function calcButtonHandle(event, selectedTracks, parent) {
+  event.preventDefault();
+  const sumTrackLengths =
+    selectedTracks.length === 1
+      ? selectedTracks[0]
+      : selectedTracks.reduce((total, currentLength) => {
+          return total + currentLength;
+        });
+
+  const convertToTimeFormat = new Date(sumTrackLengths * 1000)
+    .toISOString()
+    .slice(11, -5);
+
+  if (parent.children.length === 1) {
+    const averageLengthElements = [
+      {
+        tag: "p",
+        text: `The average length of the selected tracks: ${convertToTimeFormat}`,
+      },
+    ];
+
+    createElements(averageLengthElements, parent);
+  } else {
+    parent.children[1].textContent = `The average length of the selected tracks: ${convertToTimeFormat}`;
+  }
 }
 
 function collectVendorNames(originalProducts) {
