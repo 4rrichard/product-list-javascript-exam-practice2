@@ -112,9 +112,15 @@ function calcButtonHandle(event, selectedTracks, parent) {
           return total + currentLength;
         });
 
-  const convertToTimeFormat = new Date(sumTrackLengths * 1000)
+  const MILLISECONDS_TO_SECONDS = 1000;
+  const TIME_START_INDEX = 11;
+  const TIME_END_INDEX = -5;
+
+  const convertToTimeFormat = new Date(
+    sumTrackLengths * MILLISECONDS_TO_SECONDS
+  )
     .toISOString()
-    .slice(11, -5);
+    .slice(TIME_START_INDEX, TIME_END_INDEX);
 
   if (parent.children.length === 1) {
     const averageLengthElements = [
@@ -292,8 +298,11 @@ function createSelectElement(rootElement, originalProducts) {
 
   firstOptionElementTree.children[0].setAttribute("disabled", true);
 
-  for (let i = 0; i < 26; i++) {
-    alphabet.push(String.fromCharCode(65 + i));
+  const LETTERS_IN_ALPHABET = 26;
+  const CAPITAL_A_CHARCODE = 65;
+
+  for (let i = 0; i < LETTERS_IN_ALPHABET; i++) {
+    alphabet.push(String.fromCharCode(CAPITAL_A_CHARCODE + i));
   }
 
   alphabet.forEach((letter) => {
